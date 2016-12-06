@@ -1,0 +1,58 @@
+// Partner 1: Scott Hom
+// Partner 2: Paul Ngouchet
+
+Problem 4 Explanation of code
+
+FOURA
+
+To find the the number of alphabetical words in BigData.txt I used itteration. The method is the "Naive Method" as many may call it because it itterates over every characture. However it is the most efficient because the string read in doesnt need to be split up into other containers. The itteration was done in place on the file read into a string. Each characture was checked if it was a number. If it was then a variables that indicates if a number is present in a word was set true. If not number present was kept false. once a space was hit then the program check if number present variable is equal true. If so then reset umber present to false. else increment a count of the alpha only words.
+
+Runtime: T(n) = Θ(n). The program runs in that time because if n = length of the line read in. The for loop runs in n time multiplied by a constant. The constant is all of the Θ(1) opperations that are done in the conditional parts of the conditional statements and their resulting action. Also a constant must be added to the runtime for the setting of variables and finding the length of the line read in. T(n) = Θ(1)Θ(n) + Θ(1). Θ(1)Θ(n) + Θ(1) is Θ(n). 
+
+
+FOURB
+
+After exploring many ways to do it, i ended up with the way that i thought was the fastest way i could do it. The principle of my code is to find one pangram first starting from the beginning of the file. once it finds the first pangram which in the worst case will be terribly long. it saves the beginning of that pangram the index first and the last index end. with first and end it creates an object pangram that has first and end as datas and push it into a vector. After the first iteration, because we don’t want to waste time trying to go to first+1 index and doing again where we could still end up at of the same last index “end” . Instead i just start at the last index “end” and i go backward until i find a sequence that represent a pangram. Now that is the shortest pangram from the beginning to the “end” index. And i do that recursively again using a while loop where i have two for loops, one to go forward and another to go backward. After finding each pangram i push them in a vector and i sort them based of their size ( end - first ) after overloading the operator “()” to use the sort algorithm. i keep using the while until i exit with index “end” = length of the entire line ( the big file).
+
+How to i find a pangram ? By checking characters in the range ‘A’ to ‘Z’ and ‘a’ to ‘z’ if ('A' <= str[i] && str[i] <= 'Z')
+            index = str[i] - 'A';
+ 
+        
+        else if('a' <= str[i] && str[i] <= 'z')
+            index = str[i] - 'a';
+
+ 
+        used[index] = true;
+and i keep track of the letter of the alphabet in a vector<bool> where each box is a latte of the alphabet which becomes true when found false otherwise.
+
+Runtime: approximately big theta ( n^2 + constant ) so (n^2) because i have the first while loop which runs in n and the inner for loops which are just pieces of n. so approximately n^2 all the presetting of the code can be neglected because their runtime will be smaller than the worst case runtime.
+
+size of shortest pangram found is 76
+gC95jBfH9a s3YPi 4dB7C8u4lAdKMkZZPIMeE7FN3vHVbohxZolyYJlZ ZMvK 5rbH6WbsDTXy0q
+
+FOURC
+
+To answer the question i used a big trie that i created. First i have to build the trie using the dictionary i am only adding the words that doesn’t the first letter of my first name. by using some if statement and using the find function to check the words before inputting in the trie.
+
+When the trie is built now i need to search it with every word of the BigData.txt. if it finds it increments a count variable by 1 until the end of the file. At the end i just print the number of words found.
+
+my output is 7268939.
+
+my runtime analysis
+
+to build the trie the runtime is theta( M * sigma ) where M is the sum of the length of all the words in the dictionary. sigma is number of children which constant
+
+to search in the trie, it is theta (M * sigma ) where M is the entire length of the big string of the bigData.txt.
+
+if M is n the length of of the file string. Then my runtime is linear THETA(N).
+
+
+
+
+
+
+
+
+
+
+
