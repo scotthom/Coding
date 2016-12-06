@@ -1,0 +1,1 @@
+# Arithmetic in shell script. struct: (( mathexpression )) Dont forget to escape (\char) special char to use as math operator. 

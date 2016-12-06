@@ -1,0 +1,44 @@
+The reason we use salts is to stop precomputation attacks, such as rainbow tables. These attacks involve creating a database of hashes and their plaintexts, so that hashes can be searched for and immediately reversed into plaintext.
+
+For example*:
+
+86f7e437faa5a7fce15d1ddcb9eaeaea377667b8 a
+e9d71f5ee7c92d6dc9e92ffdad17b8bd49418f98 b
+84a516841ba77a5b4648de2cd0dfcb30ea46dbb4 c
+...
+948291f2d6da8e32b007d5270a0a5d094a455a02 ZZZZZX
+151bfc7ba4995bfa22c723ebe7921b6ddc6961bc ZZZZZY
+18f30f1ba4c62e2b460e693306b39a0de27d747c ZZZZZZ
+Most tables also include a list of common passwords:
+
+5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8 password
+e38ad214943daad1d64c102faec29de4afe9da3d password1
+b7a875fc1ea228b9061041b7cec4bd3c52ab3ce3 letmein
+5cec175b165e3d5e62c9e13ce848ef6feac81bff qwerty123
+*I'm using SHA1 here as an example, but I'll explain why this is a bad idea later.
+
+So, if my password hash is 9272d183efd235a6803f595e19616c348c275055, it would be exceedingly easy to search for it in a database and find out that the plaintext is bacon4. So, instead of spending a few hours cracking the hash (ok, in this case it'd be a few minutes on a decent GPU, but we'll talk about this later) you get the result instantly.
+
+Obviously this is bad for security! So, we use a salt. A salt is a random unique token stored with each password. Let's say the salt is 5aP3v*4!1bN<x4i&3 and the hash is 9537340ced96de413e8534b542f38089c65edff3. Now your database of passwords is useless, because nobody has rainbow tables that include that hash. It's computationally infeasible to generate rainbow tables for every possible salt.
+
+So now we've forced the bad guys to start cracking the hashes again. In this case, it'd be pretty easy to crack since I used a bad password, but it's still better than him being able to look it up in a tenth of a second!
+
+Now, since the goal of the salt is only to prevent pre-generated databases from being created, it doesn't need to be encrypted or obscured in the database. You can store it in plaintext. The goal is to force the attacker to have to crack the hashes once he gets the database, instead of being able to just look them all up in a rainbow table.
+
+However, there is one caveat. If the attacker can quietly access a salt before breaking into your database, e.g. through some script that offers the salt to anyone who asks for it, he can produce a rainbow table for that salt as easily as he could if there wasn't one. This means that he could silently take your admin account's salt and produce a nice big rainbow table, then hack into your database and immediately log in as an admin. This gives you no time to spot that a breach has occurred, and no time to take action to prevent damage, e.g. change the admin password / lock privileged accounts. This doesn't mean you should obscure your salts or attempt to encrypt them, it just means you should design your system such that the only way they can get at the salts is by breaking into the database.
+
+One other idea to consider is a pepper. A pepper is a second salt which is constant between individual passwords, but not stored in the database. We might implement it as H(salt + password + pepper), or KDF(password + pepper, salt) for a key-derivation function - we'll talk about those later. Such a value might be stored in the code. This means that the attacker has to have access to both the database and the sourcecode in order to attempt to crack the hashes. This idea should only be used to supplement other security measures. A pepper is useful when you're worried about SQL injection attacks, where the attacker only has access to the database, but this model is (slowly) becoming less common as people move to parameterized queries. You are using parameterized queries, right? Some argue that a pepper constitutes security through obscurity, since you're only obscuring the pepper, which is somewhat true, but it's not to say that the idea is without merit.
+
+Now we're at a situation where the attacker can brute-force each individual password hash, but can no longer search for all the hashes in a rainbow table and recover plaintext passwords immediately. So, how do we prevent brute-force attacks now?
+
+Modern graphics cards include GPUs with hundreds of cores. Each core is very good at mathematics, but not very good at decision making. It can perform billions of calculations per second, but it's pretty awful at doing operations that require complex branching. Cryptographic hash algorithms fit into the first type of computation. As such, frameworks such as OpenCL and CUDA can be leveraged in order to massively accelerate the operation of hash algorithms. Run oclHashcat with a decent graphics card and you can compute an excess of 10,000,000,000 MD5 hashes per second. SHA1 isn't much slower, either. There are people out there with dedicated GPU cracking rigs containing 6 or more top-end graphics cards, resulting in a cracking rate of over 50 billion hashes per second for MD5. Let me put that in context: such a system can brute force an 8 character alphanumeric password in less than 4 minutes.
+
+Clearly hashes like MD5 and SHA1 are way too fast for this kind of situation. One approach to this is to perform thousands of iterations of a cryptographic hash algorithm:
+
+hash = H(H(H(H(H(H(H(H(H(H(H(H(H(H(H(...H(password + salt) + salt) + salt) ... )
+This slows down the hash computation, but isn't perfect. Some advocate using SHA-2 family hashes, but this doesn't provide much extra security. A more solid approach is to use a key derivation function with a work factor. These functions take a password, a salt and a work factor. The work factor is a way to scale the speed of the algorithm against your hardware and security requirements:
+
+hash = KDF(password, salt, workFactor)
+The two most popular KDFs are PBKDF2 and bcrypt. PBKDF2 works by performing iterations of a keyed HMAC (though it can use block ciphers) and bcrypt works by computing and combining a large number of ciphertext blocks from the Blowfish block cipher. Both do roughly the same job. A newer variant of bcrypt called scrypt works on the same principle, but introduces a memory-hard operation that makes cracking on GPUs and FPGA-farms completely infeasible, due to memory bandwidth restrictions.
+
+Hopefully this gives you a nice overview of the problems we face when storing passwords, and answers your question about salt storage. I highly recommend checking out the "links of interest" at the bottom of Jacco's answer for further reading, as well as these links:

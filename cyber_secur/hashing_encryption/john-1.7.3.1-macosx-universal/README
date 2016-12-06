@@ -1,0 +1,52 @@
+This is a heavily patched version of John the Ripper 1.7.3.1 that I created for MacOS X (Universal) and not an official release.  There's currently no up-to-date documentation.  You should be familiar with John 1.7.3.1 to use this program.  It supports the following algorithms:
+
+- Traditional DES
+- BSDI DES
+- FreeBSD MD5
+- OpenBSD Blowfish
+- Kerberos AFS DES
+- NT LM DES
+- NT MD4
+- Mac OS X 10.4+ salted SHA-1 
+- M$ Cache Hash
+- Apache MD5
+- HMAC MD5
+- Post.Office MD5
+- Raw MD5
+- IPB2 MD5
+- Raw SHA-1
+- Kerberos v5 TGT
+- Netscape LDAP SHA
+- Netscape LDAP SSHA
+- OpenLDAP SSHA
+- Eggdrop
+- Oracle
+- MYSQL
+- MYSQL_fast
+- MySQL 4.1 double-SHA-1
+- Lotus5
+- More Secure Internet Password (Lotus v6)
+- LM Network Challenge/Response (LM C/R DES)
+- NTLMv1 Network Challenge/Response (NTLMv1 C/R MD4 DES)
+- LMv2 C/R MD4 HMAC-MD5
+- HalfLM C/R DES
+- MS-SQL (2000)
+- MS-SQL05 (2005)
+- EPiServer SID Hashes
+- PHPS MD5
+- PIX MD5
+- SAP CODVN G
+- SAP BCODE
+- Netscreen MD5
+- HTTP Digest access authentication
+
+Refer to http://www.openwall.com/john for more details.
+
+The included binary is:
+
+john - for use on G4, G5 and Intel MacOS X computers only. (Universal - Intel 64-bit)
+
+The altivec code has been re-engineered by Solar Designer (solar@openwall.com) to give amazing performance increases.  Benchmarks for altivec enhanced algorithms will exceed all but the newest Intel Core Duo hardware, even at almost half the CPU frequency.
+
+-- 
+Erik Winkler <ewinkler@erols.com>
